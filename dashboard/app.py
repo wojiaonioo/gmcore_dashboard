@@ -1,12 +1,13 @@
 """Main entry point for the GMCORE Dashboard."""
 
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dcc, html
+from dash import Dash, Input, Output, State, dcc, html, callback, ctx
 from flask import abort, send_from_directory
 from pathlib import Path
 from werkzeug.utils import safe_join
 
 from gmcore_dashboard.config import get_gmcore_root, get_testbed_root, get_experiments_root
+from gmcore_dashboard.i18n import t, set_locale, get_locale
 from gmcore_dashboard.dashboard.tabs.build_run import create_layout as create_build_run_layout
 from gmcore_dashboard.dashboard.tabs.configure import create_layout as create_configure_layout
 from gmcore_dashboard.dashboard.tabs.experiments import create_layout as create_experiments_layout
@@ -30,7 +31,7 @@ def create_app() -> Dash:
         ],
         suppress_callback_exceptions=True,
     )
-    app.title = "GMCORE Dashboard"
+    app.title = "GMCORE 仪表盘"
 
     def _bi(name: str, *, cls: str = "") -> html.I:
         return html.I(className=f"bi bi-{name} {cls}".strip())
@@ -52,7 +53,7 @@ def create_app() -> Dash:
             abort(404)
         return send_from_directory(str(EXPERIMENTS_ROOT), asset_path)
 
-    def _build_navbar() -> html.Div:
+    def _build_navbar(locale: str = "zh") -> html.Div:
         return html.Div(
             className="navbar",
             children=dbc.Container(
@@ -69,7 +70,7 @@ def create_app() -> Dash:
                                     html.Span(
                                         [
                                             html.Span("GMCORE"),
-                                            html.Span("Dashboard", className="brand-sub"),
+                                            html.Span(t("brand_sub", locale), className="brand-sub"),
                                         ],
                                         className="brand-text",
                                     ),
@@ -77,7 +78,7 @@ def create_app() -> Dash:
                                     html.Span(
                                         [
                                             _bi("cpu"),
-                                            html.Span("Scientific dynamical core"),
+                                            html.Span(t("brand_tagline", locale)),
                                         ],
                                         className="nav-chip d-none d-lg-inline-flex",
                                     ),
@@ -97,12 +98,20 @@ def create_app() -> Dash:
                                 title=str(TESTBED_ROOT),
                             ),
                             html.Span(
-                                [html.Span(className="nav-chip-dot"), html.Span("Online")],
+                                [html.Span(className="nav-chip-dot"), html.Span(t("status_online", locale))],
                                 className="nav-chip nav-chip--ok d-none d-md-inline-flex",
                             ),
                             html.Span(
                                 [_bi("tag"), html.Span("v4.1.0")],
                                 className="nav-chip nav-chip--mono d-none d-md-inline-flex",
+                            ),
+                            dbc.Button(
+                                [_bi("translate"), html.Span(t("lang_switch", locale), className="ms-1")],
+                                id="btn-lang-toggle",
+                                size="sm",
+                                outline=True,
+                                color="secondary",
+                                className="nav-chip nav-chip--mono",
                             ),
                         ],
                     ),
@@ -110,44 +119,40 @@ def create_app() -> Dash:
             ),
         )
 
-    def _build_tabs() -> dbc.Tabs:
+    def _build_tabs(locale: str = "zh") -> dbc.Tabs:
         return dbc.Tabs(
             id="main-tabs",
             active_tab="visualize",
             children=[
-                dbc.Tab(label="Visualize",   tab_id="visualize",   tab_class_name="tab-ico tab-ico--visualize"),
-                dbc.Tab(label="Experiments", tab_id="experiments", tab_class_name="tab-ico tab-ico--experiments"),
-                dbc.Tab(label="Multi-view",  tab_id="multi_view",  tab_class_name="tab-ico tab-ico--multiview"),
-                dbc.Tab(label="Configure",   tab_id="configure",   tab_class_name="tab-ico tab-ico--configure"),
-                dbc.Tab(label="Build & Run", tab_id="build_run",   tab_class_name="tab-ico tab-ico--buildrun"),
-                dbc.Tab(label="Monitor",     tab_id="monitor",     tab_class_name="tab-ico tab-ico--monitor"),
+                dbc.Tab(label=t("tab_visualize", locale),   tab_id="visualize",   tab_class_name="tab-ico tab-ico--visualize"),
+                dbc.Tab(label=t("tab_experiments", locale), tab_id="experiments", tab_class_name="tab-ico tab-ico--experiments"),
+                dbc.Tab(label=t("tab_multi_view", locale),  tab_id="multi_view",  tab_class_name="tab-ico tab-ico--multiview"),
+                dbc.Tab(label=t("tab_configure", locale),   tab_id="configure",   tab_class_name="tab-ico tab-ico--configure"),
+                dbc.Tab(label=t("tab_build_run", locale),   tab_id="build_run",   tab_class_name="tab-ico tab-ico--buildrun"),
+                dbc.Tab(label=t("tab_monitor", locale),     tab_id="monitor",     tab_class_name="tab-ico tab-ico--monitor"),
             ],
         )
 
-    def _missing_testbed_banner() -> dbc.Alert | None:
+    def _missing_testbed_banner(locale: str = "zh") -> dbc.Alert | None:
         if TESTBED_ROOT.exists():
             return None
         return dbc.Alert(
             [
-                html.Div("GMCORE testbed directory not found.", className="fw-semibold"),
-                html.Div(f"Expected path: {TESTBED_ROOT}"),
+                html.Div(t("testbed_not_found_title", locale), className="fw-semibold"),
+                html.Div(f"{t('testbed_not_found_msg', locale)} {TESTBED_ROOT}"),
             ],
             className="missing-testbed-alert glass mt-3 mb-0",
         )
 
-    def _visualize_tab() -> html.Div:
+    def _visualize_tab(locale: str = "zh") -> html.Div:
         if not TESTBED_ROOT.exists():
             return html.Div(
                 className="placeholder-tab-shell",
                 children=[
                     dbc.Alert(
                         [
-                            html.H4("Visualization unavailable", className="alert-heading"),
-                            html.P(
-                                "The dashboard could not locate the GMCORE testbed root needed "
-                                "to discover cases and NetCDF outputs.",
-                                className="mb-2",
-                            ),
+                            html.H4(t("viz_unavailable_title", locale), className="alert-heading"),
+                            html.P(t("viz_unavailable_msg", locale), className="mb-2"),
                             html.Code(str(TESTBED_ROOT)),
                         ],
                         color="danger",
@@ -172,19 +177,15 @@ def create_app() -> Dash:
             children=[create_multi_view_layout(gmcore_root=GMCORE_ROOT, testbed_root=TESTBED_ROOT)],
         )
 
-    def _configure_tab() -> html.Div:
+    def _configure_tab(locale: str = "zh") -> html.Div:
         if not TESTBED_ROOT.exists():
             return html.Div(
                 className="placeholder-tab-shell",
                 children=[
                     dbc.Alert(
                         [
-                            html.H4("Configuration editor unavailable", className="alert-heading"),
-                            html.P(
-                                "The dashboard could not locate the GMCORE testbed root needed "
-                                "to discover case namelists.",
-                                className="mb-2",
-                            ),
+                            html.H4(t("cfg_unavailable_title", locale), className="alert-heading"),
+                            html.P(t("cfg_unavailable_msg", locale), className="mb-2"),
                             html.Code(str(TESTBED_ROOT)),
                         ],
                         color="danger",
@@ -197,13 +198,13 @@ def create_app() -> Dash:
             children=[create_configure_layout(testbed_root=TESTBED_ROOT.as_posix())],
         )
 
-    def _render_tab_content(active_tab: str | None) -> html.Div:
+    def _render_tab_content(active_tab: str | None, locale: str = "zh") -> html.Div:
         if active_tab == "experiments":
             return _experiments_tab()
         if active_tab == "multi_view":
             return _multi_view_tab()
         if active_tab == "configure":
-            return _configure_tab()
+            return _configure_tab(locale)
         if active_tab == "build_run":
             return html.Div(
                 className="tab-panel",
@@ -224,29 +225,58 @@ def create_app() -> Dash:
                     )
                 ],
             )
-        return _visualize_tab()
+        return _visualize_tab(locale)
 
     app.layout = html.Div(
         className="main-shell",
         children=[
-            _build_navbar(),
+            dcc.Store(id="locale-store", data="zh", storage_type="local"),
+            html.Div(id="navbar-container", children=[_build_navbar("zh")]),
             dcc.Store(id="viz-preview-request"),
             dcc.Store(id="exp-custom-root", storage_type="local"),
             dbc.Container(
                 fluid=True,
                 className="main-content",
                 children=[
-                    _missing_testbed_banner(),
-                    _build_tabs(),
-                    html.Div(id="tab-content", children=_render_tab_content("visualize")),
+                    html.Div(id="testbed-banner", children=[_missing_testbed_banner("zh")]),
+                    html.Div(id="tabs-container", children=[_build_tabs("zh")]),
+                    html.Div(id="tab-content", children=_render_tab_content("visualize", "zh")),
                 ],
             ),
         ],
     )
 
-    @app.callback(Output("tab-content", "children"), Input("main-tabs", "active_tab"))
-    def switch_tab(active_tab: str | None) -> html.Div:
-        return _render_tab_content(active_tab)
+    @app.callback(
+        Output("locale-store", "data"),
+        Input("btn-lang-toggle", "n_clicks"),
+        State("locale-store", "data"),
+        prevent_initial_call=True,
+    )
+    def toggle_locale(n_clicks, current_locale):
+        return "en" if current_locale == "zh" else "zh"
+
+    @app.callback(
+        Output("navbar-container", "children"),
+        Output("testbed-banner", "children"),
+        Output("tabs-container", "children"),
+        Input("locale-store", "data"),
+    )
+    def update_shell_locale(locale):
+        locale = locale or "zh"
+        set_locale(locale)
+        return (
+            _build_navbar(locale),
+            _missing_testbed_banner(locale),
+            _build_tabs(locale),
+        )
+
+    @app.callback(
+        Output("tab-content", "children"),
+        Input("main-tabs", "active_tab"),
+        State("locale-store", "data"),
+    )
+    def switch_tab(active_tab: str | None, locale: str | None) -> html.Div:
+        return _render_tab_content(active_tab, locale or "zh")
 
     return app
 
