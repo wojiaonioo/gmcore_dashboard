@@ -1,0 +1,42 @@
+name: gmcore
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # === Compilers ===
+  - gcc_linux-64>=12       # GCC C compiler
+  - gxx_linux-64>=12       # GCC C++ compiler
+  - gfortran_linux-64>=12  # GNU Fortran compiler
+  - cmake>=3.16
+
+  # === MPI ===
+  - openmpi>=4.1           # MPI runtime + mpifort/mpicc wrappers
+  - openmpi-mpifort        # Fortran MPI wrapper
+
+  # === Parallel I/O stack (all MPI-enabled) ===
+  - hdf5=*=mpi*            # HDF5 with MPI parallel support
+  - libnetcdf=*=mpi*       # NetCDF-C with MPI parallel (nc-config --has-parallel4 = yes)
+  - netcdf-fortran=*=mpi*  # NetCDF-Fortran bindings (parallel)
+
+  # === Optional (uncomment if needed) ===
+  # - eccodes               # GRIB decoding (for ERA5 prep)
+  # - lapack                # LAPACK (for CAM physics)
+
+  # === Python tools (dashboard + experiments) ===
+  - python>=3.10
+  - pip
+  - numpy
+  - xarray
+  - netcdf4
+  - f90nml
+  - pyyaml
+  - matplotlib
+
+  # === pip-only packages ===
+  - pip:
+    - dash>=2.0
+    - dash-bootstrap-components>=1.0
+    - dash-ace>=0.2
+    - plotly>=5.0
+    - diskcache
+    - markdown
