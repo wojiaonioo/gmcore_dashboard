@@ -38,7 +38,7 @@ class JobManager:
         self.logs: dict[str, collections.deque[str]] = {}
         self._lock = threading.Lock()
 
-    def _find_conda_prefix(self) -> str:
+    def _find_conda_prefix(self) -> str | None:
         try:
             result = subprocess.run(
                 ["conda", "info", "--envs"],
@@ -60,7 +60,6 @@ class JobManager:
                 if parts[0] == self.conda_env and parts[-1].startswith("/"):
                     return parts[-1]
 
-        # Portable fallback: probe common conda install locations.
         candidates = []
         for var in ("CONDA_ROOT", "CONDA_EXE"):
             raw = os.environ.get(var)
@@ -74,15 +73,19 @@ class JobManager:
         for cand in candidates:
             if cand.is_dir():
                 return str(cand)
-        # Last resort: return the best-guess path (may not exist) so the
-        # caller's error surfaces as a missing-env rather than silent misroute.
-        return str(candidates[-1]) if candidates else self.conda_env
+        return None
 
-    def _conda_cmd(self, cmd: str) -> str:
-        return (
-            f"conda run --no-capture-output -n {shlex.quote(self.conda_env)} "
-            f"bash -c {shlex.quote(cmd)}"
-        )
+    @property
+    def _has_conda(self) -> bool:
+        return self.conda_prefix is not None
+
+    def _wrap_cmd(self, cmd: str) -> str:
+        if self._has_conda:
+            return (
+                f"conda run --no-capture-output -n {shlex.quote(self.conda_env)} "
+                f"bash -c {shlex.quote(cmd)}"
+            )
+        return f"bash -c {shlex.quote(cmd)}"
 
     def configure(self, build_type: str = "Release", extra_cmake_args: str = "") -> str:
         self.build_dir.mkdir(parents=True, exist_ok=True)
@@ -91,7 +94,7 @@ class JobManager:
         if extra_cmake_args.strip():
             cmake_cmd = f"{cmake_cmd} {extra_cmake_args.strip()}"
 
-        cmd = self._conda_cmd(
+        cmd = self._wrap_cmd(
             " && ".join(
                 [
                     self._env_exports(),
@@ -114,7 +117,7 @@ class JobManager:
         if jobs <= 0:
             jobs = os.cpu_count() or 1
 
-        cmd = self._conda_cmd(
+        cmd = self._wrap_cmd(
             " && ".join(
                 [
                     self._env_exports(),
@@ -145,7 +148,7 @@ class JobManager:
             raise FileNotFoundError(f"Executable not found: {executable}")
 
         nprocs = max(1, int(nprocs))
-        cmd = self._conda_cmd(
+        cmd = self._wrap_cmd(
             " && ".join(
                 [
                     self._env_exports(),
@@ -320,7 +323,7 @@ class JobManager:
         return jobs
 
     def clean_build(self) -> str:
-        clean_cmd = self._conda_cmd(
+        clean_cmd = self._wrap_cmd(
             " && ".join(
                 [
                     self._env_exports(),
@@ -340,18 +343,20 @@ class JobManager:
         return self.configure()
 
     def _env_exports(self) -> str:
-        return " && ".join(
-            [
-                # Strip host-shell pollution that overrides env RPATH / pkg-config
-                "unset LD_LIBRARY_PATH LIBRARY_PATH PKG_CONFIG_PATH "
-                "C_INCLUDE_PATH CPATH FPATH LDFLAGS CPPFLAGS "
-                "CFLAGS FFLAGS CXXFLAGS",
-                f"export CONDA_PREFIX={shlex.quote(self.conda_prefix)}",
-                'export NETCDF_ROOT="$CONDA_PREFIX"',
-                # Force MPI wrappers so CMake picks parallel-enabled netcdf/hdf5
-                "export CC=mpicc CXX=mpicxx FC=mpifort",
-            ]
-        )
+        parts = [
+            "unset LD_LIBRARY_PATH LIBRARY_PATH PKG_CONFIG_PATH "
+            "C_INCLUDE_PATH CPATH FPATH LDFLAGS CPPFLAGS "
+            "CFLAGS FFLAGS CXXFLAGS",
+        ]
+        if self._has_conda:
+            parts.append(f"export CONDA_PREFIX={shlex.quote(self.conda_prefix)}")
+            parts.append('export NETCDF_ROOT="$CONDA_PREFIX"')
+        elif os.environ.get("NETCDF_ROOT"):
+            parts.append(f"export NETCDF_ROOT={shlex.quote(os.environ['NETCDF_ROOT'])}")
+        elif os.environ.get("NETCDF"):
+            parts.append(f"export NETCDF_ROOT={shlex.quote(os.environ['NETCDF'])}")
+        parts.append("export CC=mpicc CXX=mpicxx FC=mpifort")
+        return " && ".join(parts)
 
     def _get_executable_name(self, case_name: str) -> str:
         if case_name.startswith("adv_"):
