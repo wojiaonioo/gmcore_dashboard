@@ -3,7 +3,23 @@
 from __future__ import annotations
 
 import argparse
+import socket
 import sys
+
+
+def _find_free_port(host: str, start: int = 8151, end: int = 8199) -> int:
+    """Find an available port in [start, end], fallback to OS-assigned."""
+    for port in range(start, end + 1):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            try:
+                sock.bind((host, port))
+                return port
+            except OSError:
+                continue
+    # All ports in range occupied — let OS pick one
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind((host, 0))
+        return sock.getsockname()[1]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -24,8 +40,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--port",
         type=int,
-        default=8151,
-        help="Port to bind (default: 8151)",
+        default=None,
+        help="Port to bind (default: auto-select from 8151+)",
     )
     parser.add_argument(
         "--debug",
@@ -38,10 +54,12 @@ def main(argv: list[str] | None = None) -> int:
         from gmcore_dashboard.config import set_gmcore_root
         set_gmcore_root(args.gmcore_root)
 
+    port = args.port if args.port is not None else _find_free_port(args.host)
+
     from gmcore_dashboard.dashboard.app import create_app
 
     app = create_app()
-    app.run(debug=args.debug, host=args.host, port=args.port, use_reloader=False)
+    app.run(debug=args.debug, host=args.host, port=port, use_reloader=False)
     return 0
 
 
