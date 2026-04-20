@@ -153,7 +153,7 @@ def _empty_figure(message: str) -> go.Figure:
 
 def _render_tags(tags: list[str] | None) -> list[Any]:
     if not tags:
-        return [html.Span("No tags", className="text-muted small")]
+        return [html.Span("无标签", className="text-muted small")]
     return [dbc.Badge(tag, color="light", text_color="dark", className="me-1") for tag in tags]
 
 
@@ -170,7 +170,7 @@ def _render_diag_grid(items: list[dict[str, Any]] | None) -> Any:
                 dbc.Card(
                     className=CARD_CLASS,
                     children=[
-                        dbc.CardImg(src=asset_path, top=True) if asset_path else html.Div("Missing image", className="p-4 text-muted"),
+                        dbc.CardImg(src=asset_path, top=True) if asset_path else html.Div("图片缺失", className="p-4 text-muted"),
                         dbc.CardBody(
                             [
                                 html.Div(item.get("name", "diagnostic"), className="small fw-semibold"),
@@ -213,7 +213,7 @@ def _render_compare_grid(payload: dict[str, Any]) -> Any:
                                 dbc.CardBody(
                                     dbc.CardImg(src=item_a.get("asset_path"), top=True)
                                     if item_a and item_a.get("asset_path")
-                                    else html.Div("Missing diagnostic", className="text-muted")
+                                    else html.Div("诊断缺失", className="text-muted")
                                 ),
                             ],
                         ),
@@ -227,7 +227,7 @@ def _render_compare_grid(payload: dict[str, Any]) -> Any:
                                 dbc.CardBody(
                                     dbc.CardImg(src=item_b.get("asset_path"), top=True)
                                     if item_b and item_b.get("asset_path")
-                                    else html.Div("Missing diagnostic", className="text-muted")
+                                    else html.Div("诊断缺失", className="text-muted")
                                 ),
                             ],
                         ),
@@ -329,7 +329,7 @@ def _build_actions_card() -> dbc.Card:
                     html.Div(
                         [
                             dbc.Badge("Idle", id="exp-run-status-badge", color="secondary", className="me-2"),
-                            html.Span("Selected experiment status", className="small text-secondary"),
+                            html.Span("已选试验状态", className="small text-secondary"),
                         ],
                         className="mb-3",
                     ),
@@ -357,7 +357,7 @@ def _build_actions_card() -> dbc.Card:
 
 def _build_detail_tab() -> dbc.Tab:
     return dbc.Tab(
-        label="Detail",
+        label="详情",
         tab_id="exp-detail-tab",
         children=[
             dbc.Row(
@@ -374,7 +374,7 @@ def _build_detail_tab() -> dbc.Tab:
                                             children=[
                                                 html.Div(
                                                     [
-                                                        html.H4("No experiment selected", id="exp-detail-title", className="mb-2"),
+                                                        html.H4("未选择试验", id="exp-detail-title", className="mb-2"),
                                                         html.Div(
                                                             [
                                                                 dbc.Badge("Idle", id="exp-detail-status-badge", color="secondary", className="me-2"),
@@ -488,7 +488,7 @@ def _build_detail_tab() -> dbc.Tab:
 
 def _build_compare_tab() -> dbc.Tab:
     return dbc.Tab(
-        label="Compare",
+        label="对比分析",
         tab_id="exp-compare-tab",
         children=[
             dbc.Row(
@@ -544,7 +544,7 @@ def _build_compare_tab() -> dbc.Tab:
 
 def _build_sweep_tab() -> dbc.Tab:
     return dbc.Tab(
-        label="Sweep",
+        label="参数扫描",
         tab_id="exp-sweep-tab",
         children=[
             dbc.Row(
@@ -641,7 +641,7 @@ def _build_create_modal() -> dbc.Modal:
                                             dbc.CardHeader(
                                                 [
                                                     html.Span(html.I(className="bi bi-eye"), className="ch-icon"),
-                                                    html.Span("Template Preview", className="ch-title"),
+                                                    html.Span("模板预览", className="ch-title"),
                                                 ],
                                             ),
                                             dbc.CardBody(
@@ -698,8 +698,8 @@ def _build_create_modal() -> dbc.Modal:
                             ),
                             dbc.Col(
                                 [
-                                    dbc.Label("Notes", html_for="exp-notes-input"),
-                                    dbc.Textarea(id="exp-notes-input", placeholder="Optional notes for this experiment", style={"minHeight": "120px"}),
+                                    dbc.Label("备注", html_for="exp-notes-input"),
+                                    dbc.Textarea(id="exp-notes-input", placeholder="试验备注（选填）", style={"minHeight": "120px"}),
                                 ],
                                 width=12,
                             ),
@@ -729,7 +729,7 @@ def _build_settings_strip(default_root: str) -> dbc.Card:
                     html.Span(
                         [
                             "Experiments Directory",
-                            html.Span("Persistent across sessions", className="ch-subtitle"),
+                            html.Span("跨会话持久化", className="ch-subtitle"),
                         ],
                         className="ch-title",
                     ),
@@ -825,8 +825,8 @@ def create_layout(gmcore_root: Path, testbed_root: Path) -> dbc.Container:
                             _build_registry_filters(),
                             dbc.Alert(
                                 [
-                                    html.H5("No experiments yet", className="alert-heading"),
-                                    html.P("Create your first experiment to start tuning GoMars dust-lifting parameters.", className="mb-3"),
+                                    html.H5("暂无试验", className="alert-heading"),
+                                    html.P("创建首个试验以开始参数调优。", className="mb-3"),
                                     dbc.Button("Create First Experiment", id="exp-empty-create-btn", color="primary"),
                                 ],
                                 id="exp-empty-state",
@@ -1086,11 +1086,11 @@ def select_experiment(selected_rows: list[int] | None, table_data: list[dict[str
 def render_detail(selected_experiment_id: str | None, gmcore_root: str | None, custom_root: str | None = None):
     if not selected_experiment_id:
         return (
-            "No experiment selected",
+            "未选择试验",
             "Idle",
             "secondary",
-            [html.Span("Select an experiment from the table", className="text-muted small")],
-            [html.Div("No metadata available.", className="text-muted")],
+            [html.Span("从列表中选择一个试验", className="text-muted small")],
+            [html.Div("无可用元数据。", className="text-muted")],
             [],
             [],
             dbc.Alert("Select an experiment to view diagnostics.", color="light", className="mb-0"),
@@ -1108,7 +1108,7 @@ def render_detail(selected_experiment_id: str | None, gmcore_root: str | None, c
             "Experiment not found",
             "Missing",
             "warning",
-            [html.Span("Record unavailable", className="text-muted small")],
+            [html.Span("记录不可用", className="text-muted small")],
             [html.Div("Experiment detail could not be loaded.", className="text-muted")],
             [],
             [],
@@ -1268,7 +1268,7 @@ def submit_experiment_actions(
 
     if triggered in {"exp-run-selected-btn", "exp-run-btn"}:
         if not selected_experiment_id:
-            return "Select an experiment before launching a run.", "warning", True, {"status": "invalid", "message": "No experiment selected"}
+            return "Select an experiment before launching a run.", "warning", True, {"status": "invalid", "message": "未选择试验"}
         threading.Thread(
             target=_run_existing_experiment,
             args=(gmcore_root, selected_experiment_id),

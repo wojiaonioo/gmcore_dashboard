@@ -410,13 +410,13 @@ def _build_analysis_panel() -> dbc.Card:
         children=[
             dbc.CardHeader(
                 [
-                    html.Span("Case Analysis", className="small fw-bold"),
+                    html.Span("算例分析", className="small fw-bold"),
                     html.Button(
                         "\u26f6",  # ⛶ expand icon
                         id="viz-fullscreen-open",
                         className="viz-fullscreen-open-btn",
                         n_clicks=0,
-                        title="Fullscreen preview",
+                        title="全屏预览",
                     ),
                 ],
                 className="py-2 px-2 d-flex justify-content-between align-items-center",
@@ -431,12 +431,12 @@ def _build_analysis_panel() -> dbc.Card:
                                     dcc.Textarea(
                                         id="viz-analysis-editor",
                                         placeholder=(
-                                            "Write case analysis in Markdown\u2026\n\n"
+                                            "在此编写算例分析（支持 Markdown）\u2026\n\n"
                                         ),
                                         value="",
                                         className="viz-analysis-editor",
                                     ),
-                                    label="Edit",
+                                    label="编辑",
                                     tab_id="analysis-edit",
                                 ),
                                 dbc.Tab(
@@ -451,7 +451,7 @@ def _build_analysis_panel() -> dbc.Card:
                                         ),
                                         className="viz-analysis-preview-wrap",
                                     ),
-                                    label="Preview",
+                                    label="预览",
                                     tab_id="analysis-preview",
                                 ),
                             ],

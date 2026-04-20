@@ -99,7 +99,7 @@ def _build_configuration_card() -> dbc.Card:
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-hammer"), className="ch-icon"),
-                    html.Span("Build Configuration", className="ch-title"),
+                    html.Span("编译配置", className="ch-title"),
                 ]
             ),
             dbc.CardBody(
@@ -109,7 +109,7 @@ def _build_configuration_card() -> dbc.Card:
                         children=[
                             dbc.Col(
                                 [
-                                    dbc.Label("Build Type", html_for="br-build-type", className="form-label-sm mb-1 fw-bold text-secondary"),
+                                    dbc.Label("构建类型", html_for="br-build-type", className="form-label-sm mb-1 fw-bold text-secondary"),
                                     dbc.RadioItems(
                                         id="br-build-type",
                                         options=[
@@ -125,13 +125,13 @@ def _build_configuration_card() -> dbc.Card:
                             ),
                             dbc.Col(
                                 [
-                                    dbc.Label("Precision", html_for="br-build-precision", className="form-label-sm mb-1 fw-bold text-secondary"),
+                                    dbc.Label("精度", html_for="br-build-precision", className="form-label-sm mb-1 fw-bold text-secondary"),
                                     dbc.Select(
                                         id="br-build-precision",
                                         options=[
-                                            {"label": "R4 (single)", "value": "R4"},
-                                            {"label": "R8 (double)", "value": "R8"},
-                                            {"label": "R16 (quad)", "value": "R16"},
+                                            {"label": "R4（单精度）", "value": "R4"},
+                                            {"label": "R8（双精度）", "value": "R8"},
+                                            {"label": "R16（四倍精度）", "value": "R16"},
                                         ],
                                         value="R8",
                                         size="sm",
@@ -142,7 +142,7 @@ def _build_configuration_card() -> dbc.Card:
                             dbc.Col(
                                 [
                                     dbc.Label(
-                                        "Extra CMake Args",
+                                        "附加 CMake 参数",
                                         html_for="br-build-extra-cmake",
                                         className="form-label-sm mb-1 fw-bold text-secondary",
                                     ),
@@ -200,9 +200,9 @@ def _build_run_configuration_card(
 ) -> dbc.Card:
     options = _build_case_options(testbed_data)
     helper_text = (
-        f"Scanning cases in {Path(testbed_root).as_posix()}"
+        f"正在扫描算例目录： {Path(testbed_root).as_posix()}"
         if options
-        else f"No runnable cases found in {Path(testbed_root).as_posix()}"
+        else f"未找到可运行算例： {Path(testbed_root).as_posix()}"
     )
 
     return dbc.Card(
@@ -211,7 +211,7 @@ def _build_run_configuration_card(
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-rocket-takeoff"), className="ch-icon"),
-                    html.Span("Run Configuration", className="ch-title"),
+                    html.Span("运行配置", className="ch-title"),
                 ]
             ),
             dbc.CardBody(
@@ -221,12 +221,12 @@ def _build_run_configuration_card(
                         children=[
                             dbc.Col(
                                 [
-                                    dbc.Label("Case Selection", className="form-label-sm mb-1 fw-bold text-secondary"),
+                                    dbc.Label("算例选择", className="form-label-sm mb-1 fw-bold text-secondary"),
                                     html.Div(
                                         className="d-flex gap-2 mb-2",
                                         children=[
                                             dbc.Button(
-                                                "Select All",
+                                                "全选",
                                                 id="br-select-all-btn",
                                                 color="secondary",
                                                 outline=True,
@@ -234,7 +234,7 @@ def _build_run_configuration_card(
                                                 className="py-0 px-2"
                                             ),
                                             dbc.Button(
-                                                "Deselect All",
+                                                "取消全选",
                                                 id="br-deselect-all-btn",
                                                 color="secondary",
                                                 outline=True,
@@ -266,7 +266,7 @@ def _build_run_configuration_card(
                             ),
                             dbc.Col(
                                 [
-                                    dbc.Label("MPI Processes", html_for="br-run-nprocs", className="form-label-sm mb-1 fw-bold text-secondary"),
+                                    dbc.Label("MPI 进程数", html_for="br-run-nprocs", className="form-label-sm mb-1 fw-bold text-secondary"),
                                     dbc.Input(
                                         id="br-run-nprocs",
                                         type="number",
@@ -318,7 +318,7 @@ def _build_run_configuration_card(
                             ),
                             dbc.Col(
                                 dbc.Button(
-                                    [html.I(className="bi bi-stop-fill me-2"), "Stop"],
+                                    [html.I(className="bi bi-stop-fill me-2"), "终止"],
                                     id="br-run-stop-btn",
                                     color="danger",
                                     className="w-100 fw-medium",
@@ -342,7 +342,7 @@ def _build_quick_actions_card() -> dbc.Card:
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-lightning-charge"), className="ch-icon"),
-                    html.Span("Quick Actions", className="ch-title"),
+                    html.Span("快捷操作", className="ch-title"),
                 ]
             ),
             dbc.CardBody(
@@ -368,7 +368,7 @@ def _build_job_status_card() -> dbc.Card:
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-list-task"), className="ch-icon"),
-                    html.Span("Job Status", className="ch-title"),
+                    html.Span("作业状态", className="ch-title"),
                 ]
             ),
             dbc.CardBody(
@@ -418,7 +418,7 @@ def _build_log_viewer_card() -> dbc.Card:
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-terminal"), className="ch-icon"),
-                    html.Span("Log Viewer", className="ch-title"),
+                    html.Span("日志查看器", className="ch-title"),
                 ]
             ),
             dbc.CardBody(

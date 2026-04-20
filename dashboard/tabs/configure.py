@@ -131,7 +131,7 @@ def _build_selector_column(
                     dbc.CardHeader(
                         [
                             html.Span(html.I(className="bi bi-folder2-open"), className="ch-icon"),
-                            html.Span("Case & File Selector", className="ch-title"),
+                            html.Span("算例与文件选择", className="ch-title"),
                         ]
                     ),
                     dbc.CardBody(
@@ -156,7 +156,7 @@ def _build_selector_column(
                                     dbc.CardHeader(
                                         [
                                             html.Span(html.I(className="bi bi-info-circle"), className="ch-icon"),
-                                            html.Span("Current Namelist Info", className="ch-title"),
+                                            html.Span("当前 Namelist 信息", className="ch-title"),
                                         ]
                                     ),
                                     dbc.CardBody(id="cfg-case-info"),
@@ -172,7 +172,7 @@ def _build_selector_column(
                     dbc.CardHeader(
                         [
                             html.Span(html.I(className="bi bi-files"), className="ch-icon"),
-                            html.Span("Clone Template", className="ch-title"),
+                            html.Span("克隆模板", className="ch-title"),
                         ]
                     ),
                     dbc.CardBody(
@@ -274,7 +274,7 @@ def _build_editor_column(first_case: str | None) -> dbc.Card:
                         children=[
                             dbc.Col(
                                 dbc.Button(
-                                    [html.I(className="bi bi-save2 me-2"), "Save"],
+                                    [html.I(className="bi bi-save2 me-2"), "保存"],
                                     id="cfg-save-btn",
                                     color="success",
                                     className="w-100",
@@ -283,7 +283,7 @@ def _build_editor_column(first_case: str | None) -> dbc.Card:
                             ),
                             dbc.Col(
                                 dbc.Button(
-                                    [html.I(className="bi bi-arrow-counterclockwise me-2"), "Revert"],
+                                    [html.I(className="bi bi-arrow-counterclockwise me-2"), "还原"],
                                     id="cfg-revert-btn",
                                     color="secondary",
                                     className="w-100",
@@ -670,7 +670,7 @@ def _build_case_info(selected_case: str | None, current_file: str | None, editor
 
     if not selected_case and not current_file:
         return [
-            html.Div("Select a case to inspect its namelist.", className="small text-muted")
+            html.Div("选择算例以查看其 namelist。", className="small text-muted")
         ]
 
     info_badges = [
@@ -692,7 +692,7 @@ def _build_case_info(selected_case: str | None, current_file: str | None, editor
         _info_line("time step", _pick_time_step(parsed)),
         _info_line("history", _format_summary_value(parsed.get("history_interval"))),
         html.Hr(className="border-secondary my-3"),
-        html.Div("File", className="small text-muted text-uppercase mb-1"),
+        html.Div("文件", className="small text-muted text-uppercase mb-1"),
         html.Div(file_display, className="small text-break", style=MONO_STYLE),
     ]
 

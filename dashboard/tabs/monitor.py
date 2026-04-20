@@ -85,20 +85,20 @@ def _build_status_bar() -> dbc.Card:
                                 html.Div(
                                     [
                                         html.I(className="bi bi-broadcast"),
-                                        html.Span("Active Job"),
+                                        html.Span("活跃作业"),
                                     ],
                                     className="stat-tile-label d-inline-flex align-items-center gap-1 mb-1",
                                 ),
                                 html.Div(
                                     [
                                         html.Span(
-                                            "No active job selected",
+                                            "未选择活跃作业",
                                             id="mon-job-name",
                                             className="fw-semibold me-2",
                                             style={"fontSize": "var(--fs-lg)", "color": "var(--text-1)"},
                                         ),
                                         dbc.Badge(
-                                            "Idle",
+                                            "空闲",
                                             id="mon-status-badge",
                                             color="secondary",
                                             pill=True,
@@ -114,7 +114,7 @@ def _build_status_bar() -> dbc.Card:
                                 dbc.Label(
                                     [
                                         html.I(className="bi bi-clock-history me-1"),
-                                        "Job History",
+                                        "作业历史",
                                     ],
                                     html_for="mon-job-select",
                                     className="mb-1",
@@ -123,7 +123,7 @@ def _build_status_bar() -> dbc.Card:
                                     id="mon-job-select",
                                     options=[],
                                     value=None,
-                                    placeholder="No jobs available",
+                                    placeholder="暂无作业",
                                     clearable=False,
                                 ),
                             ],
@@ -143,11 +143,11 @@ def _build_log_console_card() -> dbc.Card:
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-terminal"), className="ch-icon"),
-                    html.Span("Log Console", className="ch-title"),
+                    html.Span("日志控制台", className="ch-title"),
                     html.Span(
                         [
                             html.I(className="bi bi-arrow-repeat me-1"),
-                            "Live tail",
+                            "实时跟踪",
                         ],
                         className="badge bg-secondary ch-actions",
                     ),
@@ -170,7 +170,7 @@ def _build_log_console_card() -> dbc.Card:
                         children=[
                             dbc.Col(
                                 dbc.Button(
-                                    [html.I(className="bi bi-trash3 me-2"), "Clear Log"],
+                                    [html.I(className="bi bi-trash3 me-2"), "清空日志"],
                                     id="mon-clear-btn",
                                     color="secondary",
                                     className="w-100",
@@ -180,10 +180,10 @@ def _build_log_console_card() -> dbc.Card:
                             dbc.Col(
                                 dcc.Clipboard(
                                     content=None,
-                                    children=[html.I(className="bi bi-clipboard me-2"), "Copy to Clipboard"],
+                                    children=[html.I(className="bi bi-clipboard me-2"), "复制到剪贴板"],
                                     id="mon-copy-btn",
                                     target_id="mon-log-console",
-                                    title="Copy monitor log output",
+                                    title="复制监控日志",
                                     className="btn btn-outline-info w-100",
                                 ),
                                 sm=6,
@@ -203,7 +203,7 @@ def _build_progress_card() -> dbc.Card:
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-bar-chart-steps"), className="ch-icon"),
-                    html.Span("Progress", className="ch-title"),
+                    html.Span("运行进度", className="ch-title"),
                 ]
             ),
             dbc.CardBody(
@@ -224,7 +224,7 @@ def _build_progress_card() -> dbc.Card:
                                 className="stat-tile",
                                 children=[
                                     html.Div(
-                                        [html.I(className="bi bi-stopwatch"), html.Span("Elapsed")],
+                                        [html.I(className="bi bi-stopwatch"), html.Span("已用时间")],
                                         className="stat-tile-label",
                                     ),
                                     html.Div(
@@ -255,11 +255,11 @@ def _build_progress_card() -> dbc.Card:
                         style={"borderTop": "1px solid var(--border)"},
                         children=[
                             html.Div(
-                                [html.I(className="bi bi-flag me-1"), html.Span("Current Step")],
+                                [html.I(className="bi bi-flag me-1"), html.Span("当前步骤")],
                                 className="stat-tile-label mb-1",
                             ),
                             html.Div(
-                                "Awaiting progress markers",
+                                "等待进度标记",
                                 id="mon-current-step",
                                 className="fw-semibold",
                                 style={"fontSize": "var(--fs-md)", "color": "var(--text-1)"},
@@ -279,7 +279,7 @@ def _build_output_files_card() -> dbc.Card:
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-file-earmark-binary"), className="ch-icon"),
-                    html.Span("Output Files", className="ch-title"),
+                    html.Span("输出文件", className="ch-title"),
                 ]
             ),
             dbc.CardBody(id="mon-output-files"),
@@ -294,7 +294,7 @@ def _build_system_info_card() -> dbc.Card:
             dbc.CardHeader(
                 [
                     html.Span(html.I(className="bi bi-info-circle"), className="ch-icon"),
-                    html.Span("System Info", className="ch-title"),
+                    html.Span("系统信息", className="ch-title"),
                 ]
             ),
             dbc.CardBody(id="mon-system-info"),
@@ -328,7 +328,7 @@ def _job_options(jobs: list[dict[str, object]]) -> list[dict[str, str]]:
     options: list[dict[str, str]] = []
     for job in jobs:
         job_id = str(job["job_id"])
-        label = str(job.get("label") or "Unnamed job")
+        label = str(job.get("label") or "未命名作业")
         status = str(job.get("status") or "unknown").replace("_", " ").title()
         options.append({"label": f"{job_id} · {label} · {status}", "value": job_id})
     return options
@@ -469,12 +469,12 @@ def _build_progress_details(
     elif case_name:
         current_step = current_step if current_step != "Hour 0.0" else f"Monitoring {case_name}"
     else:
-        current_step = "Awaiting progress markers"
+        current_step = "等待进度标记"
 
     status_value = str(status.get("status") or "idle")
     if status_value == "completed" and _status_metadata(status).get("kind") == "run":
         percent = 100.0
-        if current_step in {"Awaiting progress markers", "Hour 0.0"}:
+        if current_step in {"等待进度标记", "Hour 0.0"}:
             current_step = "Run completed"
 
     if status_value != "running":
@@ -719,7 +719,7 @@ def refresh_monitor(
             False,
             "—",
             "—",
-            "Awaiting progress markers",
+            "等待进度标记",
             html.Div("No job output is available.", className="small text-muted"),
             _render_system_info({"pid": None, "start_time": None, "label": "", "metadata": {}}),
             None,
@@ -743,7 +743,7 @@ def refresh_monitor(
             False,
             "—",
             "—",
-            "Awaiting progress markers",
+            "等待进度标记",
             html.Div("No NetCDF outputs to display.", className="small text-muted"),
             _render_system_info({"pid": None, "start_time": None, "label": "", "metadata": {}}),
             None,

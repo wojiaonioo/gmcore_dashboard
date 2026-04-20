@@ -22,9 +22,9 @@ from gmcore_dashboard.experiments.dashboard_backend import scan_experiments
 CARD_CLASS = "border"
 DEFAULT_COLS = 2
 VIEW_OPTIONS = [
-    {"label": "Horizontal", "value": "horizontal"},
-    {"label": "Zonal (lat–lev)", "value": "zonal"},
-    {"label": "Meridional (lon–lev)", "value": "meridional"},
+    {"label": "水平面", "value": "horizontal"},
+    {"label": "纬向剖面（lat–lev）", "value": "zonal"},
+    {"label": "经向剖面（lon–lev）", "value": "meridional"},
 ]
 
 
@@ -54,19 +54,19 @@ def _build_toolbar() -> dbc.Card:
                 dbc.Row(
                     [
                         dbc.Col(
-                            dbc.Button("+ Add cell", id="mv-add-cell", color="primary", size="sm"),
+                            dbc.Button("+ 添加面板", id="mv-add-cell", color="primary", size="sm"),
                             width="auto",
                         ),
                         dbc.Col(
                             dbc.Button(
-                                "Clear all", id="mv-clear-cells", color="secondary", outline=True, size="sm"
+                                "清空全部", id="mv-clear-cells", color="secondary", outline=True, size="sm"
                             ),
                             width="auto",
                         ),
                         dbc.Col(
                             html.Div(
                                 [
-                                    html.Span("Columns:", className="me-2 small text-muted"),
+                                    html.Span("列数：", className="me-2 small text-muted"),
                                     dbc.ButtonGroup(
                                         [
                                             dbc.Button("1", id={"type": "mv-cols-btn", "value": 1}, size="sm", outline=True),
@@ -103,7 +103,7 @@ def _cell_card(index: int, column_count: int) -> dbc.Col:
                 dbc.CardHeader(
                     dbc.Row(
                         [
-                            dbc.Col(html.Span(f"Cell {index + 1}", className="fw-bold small"), width="auto"),
+                            dbc.Col(html.Span(f"面板 {index + 1}", className="fw-bold small"), width="auto"),
                             dbc.Col(
                                 dbc.Button(
                                     "×",
@@ -126,10 +126,10 @@ def _cell_card(index: int, column_count: int) -> dbc.Col:
                             [
                                 dbc.Col(
                                     _label_above(
-                                        "Experiment",
+                                        "数值试验",
                                         dcc.Dropdown(
                                             id={"type": "mv-exp", "index": index},
-                                            placeholder="Select experiment",
+                                            placeholder="选择试验",
                                             clearable=False,
                                         ),
                                     ),
@@ -137,10 +137,10 @@ def _cell_card(index: int, column_count: int) -> dbc.Col:
                                 ),
                                 dbc.Col(
                                     _label_above(
-                                        "File",
+                                        "文件",
                                         dcc.Dropdown(
                                             id={"type": "mv-file", "index": index},
-                                            placeholder="Pick h0 file",
+                                            placeholder="选择输出文件",
                                             clearable=False,
                                         ),
                                     ),
@@ -153,10 +153,10 @@ def _cell_card(index: int, column_count: int) -> dbc.Col:
                             [
                                 dbc.Col(
                                     _label_above(
-                                        "Variable",
+                                        "变量",
                                         dcc.Dropdown(
                                             id={"type": "mv-var", "index": index},
-                                            placeholder="Pick variable",
+                                            placeholder="选择变量",
                                             clearable=False,
                                         ),
                                     ),
@@ -164,7 +164,7 @@ def _cell_card(index: int, column_count: int) -> dbc.Col:
                                 ),
                                 dbc.Col(
                                     _label_above(
-                                        "View",
+                                        "视图",
                                         dbc.RadioItems(
                                             id={"type": "mv-view", "index": index},
                                             options=VIEW_OPTIONS,
@@ -183,7 +183,7 @@ def _cell_card(index: int, column_count: int) -> dbc.Col:
                             [
                                 dbc.Col(
                                     _label_above(
-                                        "Time",
+                                        "时间",
                                         dcc.Slider(
                                             id={"type": "mv-time", "index": index},
                                             min=0,
@@ -198,7 +198,7 @@ def _cell_card(index: int, column_count: int) -> dbc.Col:
                                 ),
                                 dbc.Col(
                                     _label_above(
-                                        "Level / Slice",
+                                        "层次/切片",
                                         dcc.Slider(
                                             id={"type": "mv-level", "index": index},
                                             min=0,
@@ -252,7 +252,7 @@ def render_grid(cell_indices, n_clicks_list, btn_ids):
         cols = int(ctx.triggered_id.get("value") or DEFAULT_COLS)
     if not cell_indices:
         return dbc.Alert(
-            "No cells. Click '+ Add cell' to start a multi-view comparison.",
+            '暂无面板。点击「+ 添加面板」开始多场对比。',
             color="light",
             className="text-center",
         )
@@ -387,7 +387,7 @@ def update_level_slider(var_name, view_mode, file_path):
 )
 def render_cell(var_name, view_mode, time_idx, level_idx, file_path, exp_id):
     if not (var_name and file_path and Path(file_path).is_file()):
-        return _empty_fig("Select experiment, file, and variable")
+        return _empty_fig("请选择试验、文件和变量")
     try:
         data, coords = load_variable_slice(
             filepath=file_path,
@@ -397,7 +397,7 @@ def render_cell(var_name, view_mode, time_idx, level_idx, file_path, exp_id):
             level_idx=int(level_idx or 0),
         )
     except Exception as exc:  # noqa: BLE001 — surface error inside figure
-        return _empty_fig(f"Load failed: {exc}")
+        return _empty_fig(f"加载失败：{exc}")
 
     data = np.asarray(data)
     if data.size == 0 or not np.any(np.isfinite(data)):
