@@ -7,7 +7,7 @@ name = "gmcore-dashboard"
 version = "0.1.0"
 description = "GMCORE experiment management and visualization dashboard"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 license = "MIT"
 dependencies = [
     "dash>=2.0",

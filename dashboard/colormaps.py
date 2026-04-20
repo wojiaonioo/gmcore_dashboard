@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Scientific colormap definitions for GMCORE Dashboard."""
 
 # Plotly built-in colorscales that work well for atmospheric data

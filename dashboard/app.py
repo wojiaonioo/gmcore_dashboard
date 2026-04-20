@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Main entry point for the GMCORE Dashboard."""
 
 import dash_bootstrap_components as dbc

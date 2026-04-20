@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Chinese display names and map backgrounds for GMCORE test cases.
 
 Keys are exact case directory names (the string returned by Path(case_dir).name).
