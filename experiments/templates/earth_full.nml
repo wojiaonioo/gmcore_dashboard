@@ -1,0 +1,106 @@
+&gmcore_control
+  !── Planet & Case ──────────────────────────────────────────────────
+  planet              = 'earth'
+  use_aqua_planet     = .false.
+  test_case           = 'N/A'          ! e.g. bw, hs, mz, rh, ss, tc, sc
+  case_name           = 'EXPERIMENT_SLUG'
+  case_desc           = 'N/A'
+
+  !── Grid ───────────────────────────────────────────────────────────
+  nlon                = 360
+  nlat                = 180
+  nlev                = 30
+
+  !── Time ───────────────────────────────────────────────────────────
+  initial_time        = '2000-01-01T00:00:00'
+  run_days            = 10
+  run_hours           = 0
+  dt_dyn              = 300
+  dt_adv              = 300
+  dt_phys             = 300
+  time_scheme         = 'wrfrk3'       ! wrfrk3, pc2
+  calendar_type       = 'gregorian'    ! gregorian, noleap
+
+  !── Dynamics Flags ─────────────────────────────────────────────────
+  nonhydrostatic      = .false.
+  hydrostatic         = .true.
+  advection           = .false.
+  ideal_dry_core      = .false.
+
+  !── Vertical Coordinate ────────────────────────────────────────────
+  vert_coord_scheme   = 'hybrid'       ! hybrid, sigma
+  vert_coord_template = 'cam_l30'
+  ptop                = 219.4
+  hybrid_coord_p0     = 100000.0
+  refer_state_scheme  = 'wrf'
+
+  !── PGF & Advection ────────────────────────────────────────────────
+  pgf_scheme          = 'lin97'        ! lin97, ptb, zangl12, zangl12_ptb
+  bg_adv_scheme       = 'ffsl'
+  pt_adv_scheme       = 'upwind'
+  limiter_type        = 'mono'
+  ffsl_flux_type      = 'ppm'
+  upwind_order        = 3
+  weno_order          = 3
+
+  !── PV Advection ───────────────────────────────────────────────────
+  pv_adv_scheme       = 'upwind'       ! midpoint, upwind, weno
+  pv_pole_stokes      = .true.
+  upwind_order_pv     = 3
+
+  !── KE Scheme ──────────────────────────────────────────────────────
+  ke_scheme           = 2
+  ke_cell_wgt         = 0.55
+
+  !── Filter ─────────────────────────────────────────────────────────
+  filter_wave_speed   = 300.0
+  filter_coef_a       = 3.8
+  filter_coef_b       = 0.5
+  filter_coef_c       = 0.0
+
+  !── Damping ────────────────────────────────────────────────────────
+  use_div_damp        = .false.
+  div_damp_order      = 2
+  div_damp_coef2      = 0.0078125      ! 1/128
+  div_damp_coef4      = 0.01
+  use_vor_damp        = .false.
+  vor_damp_order      = 2
+  vor_damp_coef2      = 0.005
+  use_smag_damp       = .false.
+  smag_damp_coef      = 0.015
+  use_laplace_damp    = .false.
+  laplace_damp_order  = 4
+  laplace_damp_coef   = 1.0e12
+  use_sponge_layer    = .false.
+  sponge_layer_k0     = 6
+  sponge_layer_coef   = 1.0e6
+  use_pole_damp       = .true.
+  pole_damp_coef      = 0.25
+  pole_damp_lat0      = 70
+
+  !── Topography ─────────────────────────────────────────────────────
+  topo_type           = 'etopo1'       ! etopo1, gmted, mola32
+  topo_regrid_type    = 'fill'         ! fill, bilin
+  use_zs_grad_filter  = .false.
+  zs_grad_filter_order  = 2
+  zs_grad_filter_coef   = 1.0e6
+  zs_grad_filter_cycles = 100
+
+  !── Physics ────────────────────────────────────────────────────────
+  physics_suite       = 'N/A'          ! N/A, simple_physics:v6, cam, gomars_v1
+
+  !── MPI / Parallel ─────────────────────────────────────────────────
+  proc_layout         = 'lon>lat'      ! lon>lat, lat>lon
+
+  !── Output ─────────────────────────────────────────────────────────
+  history_interval    = '1 days'
+  output_h0           = .true.
+  output_h0_dtype     = 'r4'
+  output_h0_new_file  = ''             ! '', one_file, by_day
+  output_h1           = .false.
+  output_h2           = .false.
+
+  !── Restart ────────────────────────────────────────────────────────
+  restart             = .false.
+  restart_interval    = 'N/A'
+/

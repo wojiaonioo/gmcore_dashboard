@@ -1,0 +1,53 @@
+sets:
+  core:
+    - cdod610
+    - season_t
+    - season_u
+    - polarcap
+    - tauxy
+    - t15
+    - annual_mean
+
+diagnostics:
+  cdod610:
+    script: tools/gomars/plot_cdod610.py
+    input_glob: "{case_name}.h0*.nc"
+    args: ["-f", "{hours_per_sol}", "--my", "{my}"]
+    outputs: ["cdod610.png"]
+  season_t:
+    script: tools/gomars/plot_season_t.py
+    input_glob: "{case_name}.h0*.nc"
+    args: ["--my", "{my}"]
+    outputs: ["season_t.png"]
+  season_u:
+    script: tools/gomars/plot_season_u.py
+    input_glob: "{case_name}.h0*.nc"
+    args: ["--my", "{my}"]
+    outputs: ["season_u.png"]
+  polarcap:
+    script: tools/gomars/plot_polarcap.py
+    input_glob: "{case_name}.h0*.nc"
+    args: ["-y", "{my}"]
+    outputs: ["polarcap.png"]
+  tauxy:
+    script: tools/gomars/plot_tauxy.py
+    input_glob: "{case_name}.h0*.nc"
+    args: ["--my", "{my}"]
+    outputs: ["tauxy.png"]
+  t15:
+    script: tools/gomars/plot_t15.py
+    input_glob: "{case_name}.h0*.nc"
+    args: ["--my", "{my}"]
+    outputs: ["t15.png"]
+  annual_mean:
+    script: tools/gomars/plot_annual_mean.py
+    input_glob: "{case_name}.h0*.nc"
+    args: ["--my", "{my}"]
+    outputs: ["annual_mean.png"]
+
+interactive_only:
+  - dust_lift
+  - ddl
+  - wsl
+  - insight_wsp
+  - diurnal_cycle

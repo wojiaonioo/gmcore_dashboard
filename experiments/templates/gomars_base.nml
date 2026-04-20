@@ -1,0 +1,42 @@
+&gmcore_control
+  nlon               = 180
+  nlat               = 90
+  nlev               = 40
+  dt_dyn             = 60
+  dt_adv             = 60
+  dt_phys            = 60
+  planet             = 'mars'
+  physics_suite      = 'gomars_v1'
+  test_case          = 'mars_cold_run'
+  case_name          = 'EXPERIMENT_SLUG'
+  run_sol            = 720
+  history_interval   = '1 hours'
+  output_h0          = .true.
+  output_h1          = .true.
+  output_h2          = .false.
+  output_h0_dtype    = 'r4'
+  output_h0_new_file = 'one_file'
+/
+
+&gomars_v1_control
+  psf             = 701.0
+  icealb          = 0.4
+  icethresh_depth = 5.0
+  nsplit          = 1
+  use_mp          = .true.
+  cloudon         = .false.
+  active_dust     = .true.
+  co2scav         = .true.
+  active_water    = .false.
+  albfeed         = .false.
+  latent_heat     = .false.
+  trefr           = 0.5
+  use_ddl         = .true.
+  alpha_d         = 5.0e-11
+  use_wsl         = .true.
+  wsl_scheme      = 'newman'
+  use_wsl_newman  = .false.
+  use_wsl_kmh     = .false.
+  tau_thresh      = 0.04
+  alpha_n         = 5.0e-5
+/

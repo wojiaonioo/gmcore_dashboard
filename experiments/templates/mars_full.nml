@@ -1,0 +1,94 @@
+&gmcore_control
+  !── Planet & Case ──────────────────────────────────────────────────
+  planet              = 'mars'
+  test_case           = 'mars_cold_run'
+  case_name           = 'EXPERIMENT_SLUG'
+  case_desc           = 'N/A'
+
+  !── Grid ───────────────────────────────────────────────────────────
+  nlon                = 180
+  nlat                = 90
+  nlev                = 40
+
+  !── Time ───────────────────────────────────────────────────────────
+  run_sol             = 720
+  dt_dyn              = 60
+  dt_adv              = 60
+  dt_phys             = 60
+  time_scheme         = 'wrfrk3'
+
+  !── Dynamics ───────────────────────────────────────────────────────
+  nonhydrostatic      = .false.
+
+  !── Vertical Coordinate ────────────────────────────────────────────
+  vert_coord_scheme   = 'hybrid'
+  hybrid_coord_p0     = 701.0
+
+  !── PGF & Advection ────────────────────────────────────────────────
+  pgf_scheme          = 'lin97'
+  bg_adv_scheme       = 'ffsl'
+  pt_adv_scheme       = 'upwind'
+  limiter_type        = 'mono'
+  ffsl_flux_type      = 'ppm'
+  upwind_order        = 3
+  pv_adv_scheme       = 'upwind'
+  upwind_order_pv     = 3
+
+  !── Filter ─────────────────────────────────────────────────────────
+  filter_wave_speed   = 300.0
+  filter_coef_a       = 3.8
+  filter_coef_b       = 0.5
+
+  !── Damping ────────────────────────────────────────────────────────
+  use_div_damp        = .false.
+  use_vor_damp        = .false.
+  use_smag_damp       = .false.
+  use_pole_damp       = .true.
+  pole_damp_coef      = 0.25
+  pole_damp_lat0      = 70
+
+  !── Topography ─────────────────────────────────────────────────────
+  topo_type           = 'mola32'
+
+  !── Physics ────────────────────────────────────────────────────────
+  physics_suite       = 'gomars_v1'
+
+  !── Output ─────────────────────────────────────────────────────────
+  history_interval    = '1 hours'
+  output_h0           = .true.
+  output_h0_dtype     = 'r4'
+  output_h0_new_file  = 'one_file'
+  output_h1           = .true.
+/
+
+&gomars_v1_control
+  !── Surface ────────────────────────────────────────────────────────
+  psf                 = 701.0
+  icealb              = 0.4
+  icethresh_depth     = 5.0
+
+  !── Microphysics ───────────────────────────────────────────────────
+  nsplit              = 1
+  use_mp              = .true.
+  cloudon             = .false.
+  trefr               = 0.5
+
+  !── Dust Lifting (DDL) ────────────────────────────────────────────
+  active_dust         = .true.
+  use_ddl             = .true.
+  alpha_d             = 5.0e-11        ! DDL tuning coefficient
+
+  !── Dust Lifting (WSL) ────────────────────────────────────────────
+  use_wsl             = .true.
+  wsl_scheme          = 'newman'       ! newman
+  use_wsl_newman      = .false.
+  use_wsl_kmh         = .false.
+  tau_thresh          = 0.04           ! WSL stress threshold
+  alpha_n             = 5.0e-5         ! WSL Newman coefficient
+
+  !── Chemistry ──────────────────────────────────────────────────────
+  co2scav             = .true.
+  active_water        = .false.
+  albfeed             = .false.
+  latent_heat         = .false.
+/

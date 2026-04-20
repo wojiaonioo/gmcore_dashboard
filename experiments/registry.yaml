@@ -1,0 +1,38 @@
+version: 1
+
+defaults:
+  workspace_root: tools/gmcore_dashboard/experiments/experiments
+  executable: build/gmcore_driver.exe
+  template_dir: tools/gmcore_dashboard/experiments/templates
+  mpi_launcher: mpirun
+  mpi_ranks: 8
+  timeout_s: 21600
+  hours_per_sol: 24
+  diagnostics_set: core
+  my: 1
+
+baselines:
+  mars_gomars_base:
+    template: tools/gmcore_dashboard/experiments/templates/gomars_base.nml
+    params:
+      planet: mars
+      physics_suite: gomars_v1
+
+experiments:
+  cdod_baseline:
+    baseline: mars_gomars_base
+    description: "Reference GoMars dust run"
+    params:
+      run_sol: 720
+      alpha_d: 5.0e-11
+      tau_thresh: 0.04
+      alpha_n: 5.0e-5
+
+  ddl_wsl_sweep:
+    parent: cdod_baseline
+    sweep:
+      strategy: full_factorial
+      axes:
+        alpha_d: [1.0e-11, 5.0e-11, 1.0e-10]
+        tau_thresh: [0.02, 0.04, 0.06]
+        alpha_n: [1.0e-5, 5.0e-5]
