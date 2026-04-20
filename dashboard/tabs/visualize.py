@@ -299,9 +299,9 @@ def _build_main_panel() -> html.Div:
                 children=[
                     dbc.CardHeader(
                         [
-                            html.Span("Multi-variable grid", className="me-2"),
+                            html.Span("多变量对比", className="me-2"),
                             html.Small(
-                                "same case & file, choose 2+ variables to compare",
+                                "同一算例/文件，选择多个变量并排对比",
                                 className="text-muted",
                             ),
                         ]
@@ -310,7 +310,7 @@ def _build_main_panel() -> html.Div:
                         [
                             html.Div(
                                 [
-                                    html.Label("Variables", className="viz-ctrl-label"),
+                                    html.Label("变量选择", className="viz-ctrl-label"),
                                     dcc.Checklist(
                                         id="viz-multivar-checklist",
                                         options=[],
@@ -326,7 +326,7 @@ def _build_main_panel() -> html.Div:
                                 [
                                     dbc.Col(
                                         [
-                                            html.Label("Columns", className="viz-ctrl-label"),
+                                            html.Label("列数", className="viz-ctrl-label"),
                                             dbc.Select(
                                                 id="viz-multivar-cols",
                                                 options=[
@@ -341,12 +341,44 @@ def _build_main_panel() -> html.Div:
                                         md=2,
                                     ),
                                     dbc.Col(
-                                        html.Small(
-                                            "Time/level/view settings above also apply here.",
-                                            className="text-muted",
-                                        ),
-                                        md=10,
-                                        className="d-flex align-items-end",
+                                        [
+                                            html.Label("时间步", className="viz-ctrl-label"),
+                                            dcc.Slider(
+                                                id="viz-mv-time-slider",
+                                                min=0, max=0, step=1, value=0,
+                                                marks=None,
+                                                tooltip={"placement": "bottom", "always_visible": False},
+                                            ),
+                                        ],
+                                        md=4,
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            html.Label("层次", className="viz-ctrl-label"),
+                                            dcc.Slider(
+                                                id="viz-mv-level-slider",
+                                                min=0, max=0, step=1, value=0,
+                                                marks=None,
+                                                tooltip={"placement": "bottom", "always_visible": False},
+                                            ),
+                                        ],
+                                        md=3,
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            html.Label("视图", className="viz-ctrl-label"),
+                                            dbc.Select(
+                                                id="viz-mv-view-mode",
+                                                options=[
+                                                    {"label": "水平面", "value": "horizontal"},
+                                                    {"label": "纬向剖面", "value": "zonal"},
+                                                    {"label": "经向剖面", "value": "meridional"},
+                                                ],
+                                                value="horizontal",
+                                                className="viz-select",
+                                            ),
+                                        ],
+                                        md=3,
                                     ),
                                 ],
                                 className="g-2 mb-2",
@@ -355,7 +387,7 @@ def _build_main_panel() -> html.Div:
                                 id="viz-multivar-grid",
                                 children=[
                                     html.Div(
-                                        "Tick 2+ variables above to render a grid.",
+                                        "勾选 2 个以上变量以渲染对比网格。",
                                         className="text-muted text-center py-4",
                                     )
                                 ],
@@ -1485,12 +1517,32 @@ def _multivar_cell(
 
 
 @callback(
+    Output("viz-mv-time-slider", "max"),
+    Output("viz-mv-time-slider", "value"),
+    Output("viz-mv-level-slider", "max"),
+    Output("viz-mv-level-slider", "value"),
+    Input("viz-nc-meta", "data"),
+)
+def sync_mv_sliders(nc_meta: dict[str, Any] | None):
+    if not nc_meta:
+        return 0, 0, 0, 0
+    time_max = max(0, int(nc_meta.get("time_steps", 1)) - 1)
+    dims = nc_meta.get("dims") or {}
+    level_max = 0
+    for dim_name in ("lev", "ilev"):
+        if dim_name in dims and dims[dim_name] > 1:
+            level_max = dims[dim_name] - 1
+            break
+    return time_max, 0, level_max, 0
+
+
+@callback(
     Output("viz-multivar-grid", "children"),
     Input("viz-multivar-checklist", "value"),
     Input("viz-multivar-cols", "value"),
-    Input("viz-time-slider", "value"),
-    Input("viz-level-slider", "value"),
-    Input("viz-view-mode", "value"),
+    Input("viz-mv-time-slider", "value"),
+    Input("viz-mv-level-slider", "value"),
+    Input("viz-mv-view-mode", "value"),
     State("viz-file-dropdown", "value"),
     State("viz-nc-meta", "data"),
 )
@@ -1506,7 +1558,7 @@ def render_multivar_grid(
     selection = [v for v in (var_names or []) if v]
     if not selection or not file_path:
         return html.Div(
-            "Tick 2+ variables above to render a grid.",
+            "勾选 2 个以上变量以渲染对比网格。",
             className="text-muted text-center py-4",
         )
     try:
